@@ -1,0 +1,196 @@
+/* 遮罩层 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(0px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.overlay.visible {
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  opacity: 1;
+}
+
+/* 模态框主体 */
+.modal {
+  width: 50vw;
+  height: 30vh;
+  position: relative;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  transform: scale(0.1) rotate(45deg);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal.modalVisible {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+/* 点击动画效果 */
+.modal.animating {
+  animation: dotToImage 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes dotToImage {
+  0% {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transform: scale(1);
+  }
+  50% {
+    border-radius: 25%;
+    transform: scale(1.2);
+  }
+  100% {
+    width: 50vw;
+    height: 30vh;
+    border-radius: 0;
+    transform: scale(1);
+  }
+}
+
+/* 移动端适配 */
+.modal.mobile {
+  width: 90vw;
+  height: 50vh;
+}
+
+/* 关闭按钮 */
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.closeButton:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+/* 图片容器 */
+.imageContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 文字叠加层 */
+.textOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  padding: 40px 20px 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.modal:hover .textOverlay {
+  transform: translateY(0);
+}
+
+.overlayText {
+  color: white;
+  font-size: 14px;
+  line-height: 1.5;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  font-weight: 400;
+}
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .modal {
+    width: 60vw;
+    height: 35vh;
+  }
+  
+  .modal.mobile {
+    width: 85vw;
+    height: 45vh;
+  }
+}
+
+/* 手机适配 */
+@media (max-width: 768px) {
+  .modal {
+    width: 90vw;
+    height: 50vh;
+  }
+  
+  .closeButton {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .textOverlay {
+    padding: 30px 15px 15px;
+  }
+  
+  .overlayText {
+    font-size: 12px;
+  }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 480px) {
+  .modal {
+    width: 95vw;
+    height: 60vh;
+  }
+  
+  .textOverlay {
+    padding: 25px 12px 12px;
+  }
+  
+  .overlayText {
+    font-size: 11px;
+  }
+}
+
+/* 超小屏适配 */
+@media (max-width: 320px) {
+  .modal {
+    width: 98vw;
+    height: 65vh;
+  }
+}

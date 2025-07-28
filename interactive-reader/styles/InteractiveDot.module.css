@@ -1,0 +1,137 @@
+.dot {
+  display: inline-block;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  margin: 0 2px;
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none;
+}
+
+.innerDot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background-color: #3498db;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.hovered .innerDot {
+  width: 10px;
+  height: 10px;
+  background-color: #2980b9;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+}
+
+/* 按下状态 */
+.pressed .innerDot {
+  width: 8px;
+  height: 8px;
+  background-color: #1f5f8b;
+  box-shadow: 0 0 12px rgba(52, 152, 219, 0.8);
+}
+
+/* 长按状态 */
+.longPressed .innerDot {
+  width: 14px;
+  height: 14px;
+  background-color: #e74c3c;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+  animation: longPressGlow 0.5s ease-in-out;
+}
+
+/* 长按指示器 */
+.longPressIndicator {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  z-index: 10;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* 脉冲动画 */
+.dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background-color: transparent;
+  border-radius: 50%;
+  border: 1px solid #3498db;
+  opacity: 0;
+  animation: pulse 2s infinite;
+}
+
+/* 长按时的脉冲动画 */
+.longPressed::after {
+  border-color: #e74c3c;
+  animation: longPressPulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.8;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes longPressPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes longPressGlow {
+  0% {
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(231, 76, 60, 1);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

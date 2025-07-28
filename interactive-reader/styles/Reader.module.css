@@ -1,0 +1,30 @@
+.reader {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Georgia', serif;
+  line-height: 1.6;
+  position: relative;
+}
+
+.content {
+  padding: 20px;
+}
+
+.paragraph {
+  margin-bottom: 1.5em;
+  position: relative;
+  text-align: justify;
+}
+
+/* 标题样式 */
+.content p:first-child {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 1em;
+  text-align: center;
+}
