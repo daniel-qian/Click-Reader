@@ -1,0 +1,74 @@
+(TraeAI-7) D:\Click-Reader [0:] $ python epub_parser.py --preview
+👀 预览模式 - 只显示解析结果，不生成文件
+📂 输入目录: d:\Click-Reader\epub-files
+📚 找到 2 个EPUB文件
+
+============================================================
+🔄 处理文件: a gentleman in moscow zh.epub
+============================================================
+📚 正在加载EPUB文件: d:\Click-Reader\epub-files\a gentleman in moscow zh.epub
+✅ EPUB文件加载成功
+📖 书籍信息:
+   标题: 莫斯科绅士
+   作者: 【美】埃默·托尔斯（Amor Towles）;马韧译
+   语言: zh-cn
+🔍 正在查找第一章内容...
+📄 找到 21 个文档项目
+📋 检查文档 1: Text/cover.xhtml
+   内容长度: 0 字符
+📋 检查文档 2: Text/preface1.xhtml
+   内容长度: 10 字符
+📋 检查文档 3: Text/preface2.xhtml
+   内容长度: 1913 字符
+   前100字符: 1922年　莫斯科 我仍记得 当它 像是徒步而来的行者 在我们之中停驻 一首旋律 奏出美洲狮似的音符 而现在，我们希求着什么？ 这答案 如我此前所给 是沉默 是目不转睛地削梨 将晚安 和我的鞠躬一并送...
+📖 根据内容长度判断为第一章候选
+📝 段落分析:
+   总段落数: 1
+   第一段预览: 1922年　莫斯科 我仍记得 当它 像是徒步而来的行者 在我们之中停驻 一首旋律 奏 出美洲狮似的音符...
+
+📋 解析预览结果:
+📖 书籍信息: 莫斯科绅士 - 【美】埃默·托尔斯（Amor Towles）;马韧译
+🆔 书籍ID: d9ce6174
+📄 源文件: Text/preface2.xhtml
+📊 第一章统计:
+   字符总数: 1913
+   段落总数: 1
+
+📝 段落预览:
+   段落1: 1922年　莫斯科 我仍记得 当它 像是徒步而来的行者 在我们之中停驻 一首旋律 奏出美洲狮似的音符 而现在，我们希求着什么？ 这答案 如我此前所给 是沉默 是...
+           位置: 0-1913
+✅ a gentleman in moscow zh.epub 预览完成
+
+============================================================
+🔄 处理文件: A Gentleman in Moscow.epub
+============================================================
+📚 正在加载EPUB文件: d:\Click-Reader\epub-files\A Gentleman in Moscow.epub
+✅ EPUB文件加载成功
+📖 书籍信息:
+   标题: 9780099558781
+   作者: Unknown
+   语言: en
+🔍 正在查找第一章内容...
+📄 找到 8 个文档项目
+📋 检查文档 1: index_split_000.html
+   内容长度: 103433 字符
+   前100字符: ALSO BY AMOR TOWLES Rules of Civility VIKING An imprint of Penguin Random House LLC 375 Hudson Stree...
+✅ 找到第一章! 匹配模式: 1\.|1\s
+📝 段落分析:
+   总段落数: 1
+   第一段预览: ALSO BY AMOR TOWLES Rules of Civility VIKING An im...
+
+📋 解析预览结果:
+📖 书籍信息: 9780099558781 - Unknown
+🆔 书籍ID: 84904d20
+📄 源文件: index_split_000.html
+📊 第一章统计:
+   字符总数: 103433
+   段落总数: 1
+
+📝 段落预览:
+   段落1: ALSO BY AMOR TOWLES Rules of Civility VIKING An imprint of Penguin Random House ...
+           位置: 0-103433
+✅ A Gentleman in Moscow.epub 预览完成
+
+👀 预览完成! 使用 'python epub_parser.py' 生成JSON文件
