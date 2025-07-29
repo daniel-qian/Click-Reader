@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "title": "9780099558781",
+    "author": "Unknown",
+    "language": "en"
+  },
+  "extraction_summary": {
+    "total_files_extracted": 8,
+    "total_files_skipped": 0,
+    "raw_output_directory": "extracted_html\\A Gentleman in Moscow\\raw_html",
+    "cleaned_output_directory": "extracted_html\\A Gentleman in Moscow\\cleaned_html",
+    "epub_source": "D:\\Click-Reader\\epub_parser\\epub-files\\A Gentleman in Moscow.epub",
+    "config_used": {
+      "preserve_comments": true,
+      "skip_noise_pages": true,
+      "keep_cover": true,
+      "min_text_length": 50,
+      "verbose": true
+    }
+  },
+  "spine_info": [
+    {
+      "index": 0,
+      "item_id": "id163",
+      "file_name": "index_split_000.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 1,
+      "item_id": "id162",
+      "file_name": "index_split_001.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 2,
+      "item_id": "id161",
+      "file_name": "index_split_002.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 3,
+      "item_id": "id160",
+      "file_name": "index_split_003.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 4,
+      "item_id": "id159",
+      "file_name": "index_split_004.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 5,
+      "item_id": "id158",
+      "file_name": "index_split_005.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 6,
+      "item_id": "id157",
+      "file_name": "index_split_006.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 7,
+      "item_id": "id156",
+      "file_name": "index_split_007.html",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    }
+  ],
+  "extracted_files": [
+    {
+      "index": 0,
+      "original_name": "index_split_000.html",
+      "output_name": "chapter_000_index_split_000.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_000_index_split_000.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_000_index_split_000.html",
+      "raw_size_bytes": 132134,
+      "cleaned_size_bytes": 125795
+    },
+    {
+      "index": 1,
+      "original_name": "index_split_001.html",
+      "output_name": "chapter_001_index_split_001.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_001_index_split_001.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_001_index_split_001.html",
+      "raw_size_bytes": 147374,
+      "cleaned_size_bytes": 140704
+    },
+    {
+      "index": 2,
+      "original_name": "index_split_002.html",
+      "output_name": "chapter_002_index_split_002.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_002_index_split_002.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_002_index_split_002.html",
+      "raw_size_bytes": 140682,
+      "cleaned_size_bytes": 136851
+    },
+    {
+      "index": 3,
+      "original_name": "index_split_003.html",
+      "output_name": "chapter_003_index_split_003.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_003_index_split_003.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_003_index_split_003.html",
+      "raw_size_bytes": 127386,
+      "cleaned_size_bytes": 125483
+    },
+    {
+      "index": 4,
+      "original_name": "index_split_004.html",
+      "output_name": "chapter_004_index_split_004.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_004_index_split_004.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_004_index_split_004.html",
+      "raw_size_bytes": 247620,
+      "cleaned_size_bytes": 235300
+    },
+    {
+      "index": 5,
+      "original_name": "index_split_005.html",
+      "output_name": "chapter_005_index_split_005.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_005_index_split_005.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_005_index_split_005.html",
+      "raw_size_bytes": 126249,
+      "cleaned_size_bytes": 122144
+    },
+    {
+      "index": 6,
+      "original_name": "index_split_006.html",
+      "output_name": "chapter_006_index_split_006.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_006_index_split_006.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_006_index_split_006.html",
+      "raw_size_bytes": 146741,
+      "cleaned_size_bytes": 138565
+    },
+    {
+      "index": 7,
+      "original_name": "index_split_007.html",
+      "output_name": "chapter_007_index_split_007.html",
+      "raw_file_path": "extracted_html\\A Gentleman in Moscow\\raw_html\\chapter_007_index_split_007.html",
+      "cleaned_file_path": "extracted_html\\A Gentleman in Moscow\\cleaned_html\\chapter_007_index_split_007.html",
+      "raw_size_bytes": 4825,
+      "cleaned_size_bytes": 4803
+    }
+  ],
+  "skipped_files": []
+}

@@ -1,2 +1,4 @@
-EbookLib==0.18
-beautifulsoup4==4.12.2
+# EPUB HTML提取器依赖
+EbookLib>=0.18
+beautifulsoup4>=4.12.0
+lxml>=4.9.0

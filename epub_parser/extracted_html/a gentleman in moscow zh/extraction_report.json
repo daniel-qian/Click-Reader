@@ -1,0 +1,354 @@
+{
+  "metadata": {
+    "title": "莫斯科绅士",
+    "author": "【美】埃默·托尔斯（Amor Towles）;马韧译",
+    "language": "zh-cn"
+  },
+  "extraction_summary": {
+    "total_files_extracted": 18,
+    "total_files_skipped": 3,
+    "raw_output_directory": "extracted_html\\a gentleman in moscow zh\\raw_html",
+    "cleaned_output_directory": "extracted_html\\a gentleman in moscow zh\\cleaned_html",
+    "epub_source": "D:\\Click-Reader\\epub_parser\\epub-files\\a gentleman in moscow zh.epub",
+    "config_used": {
+      "preserve_comments": true,
+      "skip_noise_pages": true,
+      "keep_cover": true,
+      "min_text_length": 50,
+      "verbose": true
+    }
+  },
+  "spine_info": [
+    {
+      "index": 0,
+      "item_id": "cov1_1",
+      "file_name": "Text/cover.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 1,
+      "item_id": "Copyright.xhtml",
+      "file_name": "Text/Copyright.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 2,
+      "item_id": "pre1_1",
+      "file_name": "Text/preface1.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 3,
+      "item_id": "pre2_2",
+      "file_name": "Text/preface2.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 4,
+      "item_id": "isbn9787540485528_1",
+      "file_name": "Text/part1.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 5,
+      "item_id": "part1_0001.xhtml",
+      "file_name": "Text/part1_0001.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 6,
+      "item_id": "isbn9787540485528_2",
+      "file_name": "Text/part2.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 7,
+      "item_id": "part2_0001.xhtml",
+      "file_name": "Text/part2_0001.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 8,
+      "item_id": "isbn9787540485528_2_3",
+      "file_name": "Text/chapter3.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 9,
+      "item_id": "isbn9787540485528_2_4",
+      "file_name": "Text/chapter4.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 10,
+      "item_id": "isbn9787540485528_3",
+      "file_name": "Text/part3.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 11,
+      "item_id": "part3_0001.xhtml",
+      "file_name": "Text/part3_0001.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 12,
+      "item_id": "isbn9787540485528_3_6",
+      "file_name": "Text/chapter6.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 13,
+      "item_id": "isbn9787540485528_3_7",
+      "file_name": "Text/chapter7.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 14,
+      "item_id": "isbn9787540485528_4",
+      "file_name": "Text/part4.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 15,
+      "item_id": "part4_0001.xhtml",
+      "file_name": "Text/part4_0001.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 16,
+      "item_id": "isbn9787540485528_4_9",
+      "file_name": "Text/chapter9.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 17,
+      "item_id": "isbn9787540485528_4_10",
+      "file_name": "Text/chapter10.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 18,
+      "item_id": "isbn9787540485528_5",
+      "file_name": "Text/part5.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 19,
+      "item_id": "part5_0001.xhtml",
+      "file_name": "Text/part5_0001.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    },
+    {
+      "index": 20,
+      "item_id": "pos1_1",
+      "file_name": "Text/postscript1.xhtml",
+      "linear": "yes",
+      "media_type": "application/xhtml+xml"
+    }
+  ],
+  "extracted_files": [
+    {
+      "index": 3,
+      "original_name": "Text/preface2.xhtml",
+      "output_name": "chapter_003_preface2.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_003_preface2.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_003_preface2.html",
+      "raw_size_bytes": 8614,
+      "cleaned_size_bytes": 8134
+    },
+    {
+      "index": 4,
+      "original_name": "Text/part1.xhtml",
+      "output_name": "chapter_004_part1.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_004_part1.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_004_part1.html",
+      "raw_size_bytes": 368,
+      "cleaned_size_bytes": 366
+    },
+    {
+      "index": 5,
+      "original_name": "Text/part1_0001.xhtml",
+      "output_name": "chapter_005_part1_0001.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_005_part1_0001.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_005_part1_0001.html",
+      "raw_size_bytes": 240528,
+      "cleaned_size_bytes": 234303
+    },
+    {
+      "index": 6,
+      "original_name": "Text/part2.xhtml",
+      "output_name": "chapter_006_part2.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_006_part2.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_006_part2.html",
+      "raw_size_bytes": 368,
+      "cleaned_size_bytes": 366
+    },
+    {
+      "index": 7,
+      "original_name": "Text/part2_0001.xhtml",
+      "output_name": "chapter_007_part2_0001.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_007_part2_0001.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_007_part2_0001.html",
+      "raw_size_bytes": 54385,
+      "cleaned_size_bytes": 53113
+    },
+    {
+      "index": 8,
+      "original_name": "Text/chapter3.xhtml",
+      "output_name": "chapter_008_chapter3.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_008_chapter3.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_008_chapter3.html",
+      "raw_size_bytes": 37755,
+      "cleaned_size_bytes": 36868
+    },
+    {
+      "index": 9,
+      "original_name": "Text/chapter4.xhtml",
+      "output_name": "chapter_009_chapter4.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_009_chapter4.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_009_chapter4.html",
+      "raw_size_bytes": 54575,
+      "cleaned_size_bytes": 53413
+    },
+    {
+      "index": 10,
+      "original_name": "Text/part3.xhtml",
+      "output_name": "chapter_010_part3.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_010_part3.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_010_part3.html",
+      "raw_size_bytes": 370,
+      "cleaned_size_bytes": 368
+    },
+    {
+      "index": 11,
+      "original_name": "Text/part3_0001.xhtml",
+      "output_name": "chapter_011_part3_0001.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_011_part3_0001.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_011_part3_0001.html",
+      "raw_size_bytes": 141169,
+      "cleaned_size_bytes": 137752
+    },
+    {
+      "index": 12,
+      "original_name": "Text/chapter6.xhtml",
+      "output_name": "chapter_012_chapter6.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_012_chapter6.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_012_chapter6.html",
+      "raw_size_bytes": 108716,
+      "cleaned_size_bytes": 105954
+    },
+    {
+      "index": 13,
+      "original_name": "Text/chapter7.xhtml",
+      "output_name": "chapter_013_chapter7.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_013_chapter7.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_013_chapter7.html",
+      "raw_size_bytes": 103293,
+      "cleaned_size_bytes": 100816
+    },
+    {
+      "index": 14,
+      "original_name": "Text/part4.xhtml",
+      "output_name": "chapter_014_part4.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_014_part4.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_014_part4.html",
+      "raw_size_bytes": 369,
+      "cleaned_size_bytes": 367
+    },
+    {
+      "index": 15,
+      "original_name": "Text/part4_0001.xhtml",
+      "output_name": "chapter_015_part4_0001.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_015_part4_0001.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_015_part4_0001.html",
+      "raw_size_bytes": 41827,
+      "cleaned_size_bytes": 40885
+    },
+    {
+      "index": 16,
+      "original_name": "Text/chapter9.xhtml",
+      "output_name": "chapter_016_chapter9.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_016_chapter9.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_016_chapter9.html",
+      "raw_size_bytes": 38724,
+      "cleaned_size_bytes": 37607
+    },
+    {
+      "index": 17,
+      "original_name": "Text/chapter10.xhtml",
+      "output_name": "chapter_017_chapter10.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_017_chapter10.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_017_chapter10.html",
+      "raw_size_bytes": 54852,
+      "cleaned_size_bytes": 52520
+    },
+    {
+      "index": 18,
+      "original_name": "Text/part5.xhtml",
+      "output_name": "chapter_018_part5.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_018_part5.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_018_part5.html",
+      "raw_size_bytes": 369,
+      "cleaned_size_bytes": 367
+    },
+    {
+      "index": 19,
+      "original_name": "Text/part5_0001.xhtml",
+      "output_name": "chapter_019_part5_0001.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_019_part5_0001.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_019_part5_0001.html",
+      "raw_size_bytes": 166080,
+      "cleaned_size_bytes": 161487
+    },
+    {
+      "index": 20,
+      "original_name": "Text/postscript1.xhtml",
+      "output_name": "chapter_020_postscript1.html",
+      "raw_file_path": "extracted_html\\a gentleman in moscow zh\\raw_html\\chapter_020_postscript1.html",
+      "cleaned_file_path": "extracted_html\\a gentleman in moscow zh\\cleaned_html\\chapter_020_postscript1.html",
+      "raw_size_bytes": 26572,
+      "cleaned_size_bytes": 25965
+    }
+  ],
+  "skipped_files": [
+    {
+      "index": 0,
+      "file_name": "Text/cover.xhtml",
+      "item_id": "cov1_1",
+      "skip_reason": "文件名包含噪声关键字: cover"
+    },
+    {
+      "index": 1,
+      "file_name": "Text/Copyright.xhtml",
+      "item_id": "Copyright.xhtml",
+      "skip_reason": "文件名包含噪声关键字: copyright"
+    },
+    {
+      "index": 2,
+      "file_name": "Text/preface1.xhtml",
+      "item_id": "pre1_1",
+      "skip_reason": "空白页面 (文本长度: 10, 有意义标签: 1)"
+    }
+  ]
+}

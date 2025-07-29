@@ -24,6 +24,23 @@ class EPUBStructureAnalyzer:
         self.epub_path = epub_path
         self.book = None
         
+    def get_item_type_name(self, item_type):
+        """获取项目类型的可读名称"""
+        type_map = {
+            ebooklib.ITEM_UNKNOWN: 'UNKNOWN',
+            ebooklib.ITEM_IMAGE: 'IMAGE', 
+            ebooklib.ITEM_STYLE: 'STYLE',
+            ebooklib.ITEM_SCRIPT: 'SCRIPT',
+            ebooklib.ITEM_NAVIGATION: 'NAVIGATION',
+            ebooklib.ITEM_VECTOR: 'VECTOR',
+            ebooklib.ITEM_FONT: 'FONT',
+            ebooklib.ITEM_VIDEO: 'VIDEO',
+            ebooklib.ITEM_AUDIO: 'AUDIO',
+            ebooklib.ITEM_DOCUMENT: 'DOCUMENT',
+            ebooklib.ITEM_COVER: 'COVER'
+        }
+        return type_map.get(item_type, f'TYPE_{item_type}')
+        
     def load_epub(self) -> bool:
         """加载EPUB文件"""
         try:
@@ -220,13 +237,17 @@ class EPUBStructureAnalyzer:
                             item_info['content_length'] = len(text)
                             item_info['content_preview'] = text[:100] if text else ''
                             
-                            print(f"   {i+1:2d}. 📄 {item.get_name():30s} [{item.get_type():15s}] {len(text):6d}字符")
+                            # 修复：使用类型名称映射
+                            type_name = self.get_item_type_name(item.get_type())
+                            print(f"   {i+1:2d}. 📄 {item.get_name():30s} [{type_name:15s}] {len(text):6d}字符")
                             if text:
                                 print(f"       预览: {text[:80]}...")
                         except Exception as e:
-                            print(f"   {i+1:2d}. 📄 {item.get_name():30s} [{item.get_type():15s}] 解析错误: {e}")
+                            type_name = self.get_item_type_name(item.get_type())
+                            print(f"   {i+1:2d}. 📄 {item.get_name():30s} [{type_name:15s}] 解析错误: {e}")
                     else:
-                        print(f"   {i+1:2d}. 📎 {item.get_name():30s} [{item.get_type():15s}]")
+                        type_name = self.get_item_type_name(item.get_type())
+                        print(f"   {i+1:2d}. 📎 {item.get_name():30s} [{type_name:15s}]")
                     
                     all_items.append(item_info)
                     
@@ -254,7 +275,16 @@ class EPUBStructureAnalyzer:
                             content = item.get_content().decode('utf-8', errors='ignore')
                             nav_info['content'] = content
                             
-                            soup = BeautifulSoup(content, 'html.parser')
+                            # 修复：优先使用xml解析器
+                            try:
+                                soup = BeautifulSoup(content, 'xml')
+                            except:
+                                # 如果没有安装lxml，回退到html.parser
+                                import warnings
+                                from bs4 import XMLParsedAsHTMLWarning
+                                warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+                                soup = BeautifulSoup(content, 'html.parser')
+                            
                             nav_elements = soup.find_all('nav')
                             
                             print(f"\n📍 找到导航文档: {item.get_name()}")
