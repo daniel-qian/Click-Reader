@@ -1,8 +1,10 @@
-# 📑 Data Contract — Interactive Reading MVP
+# 📑 Data Contract — Interactive Reading MVP v0.5
 
-> **Scope:** Defines the artefacts, schemas and hand‑off points between the *Pre‑processor* (EPUB splitter), the **single** *AI Workflow* (book‑insight + hotspot generator) and the *Core API / DB*.
-> **Audience:** Pre‑processing dev, Workflow team, Backend dev.
-> **Status:** Draft v0.4 · 2025‑07‑29
+> **Scope**  Defines artefacts, schemas and hand‑off points across **three decoupled workflows** and the Core API/DB.
+>
+> **Audience**  Pre‑processing dev · Workflow team · Backend dev · Data engineering.
+>
+> **Status**  Draft v0.5 · 2025‑07‑30
 
 ---
 
@@ -10,222 +12,88 @@
 
 | Field            | Value                                                   |
 | ---------------- | ------------------------------------------------------- |
-| `schema_version` | `0.3.0`                                                 |
-| `last_updated`   | `2025‑07‑28`                                            |
+| `schema_version` | `0.4.0` *(BREAKING)*                                    |
+| `last_updated`   | `2025‑07‑30`                                            |
 | **Change rule**  | MAJOR – breaking · MINOR – additive · PATCH – docs/typo |
 
 ---
 
-## 1  High‑level Flow
+## 1  Storage Layer (Supabase / Postgres)
 
-```mermaid
-graph TD
-  A[EPUB file] --> B(HTML Extractor)
-  B -->|cleaned HTML| C[S3 / OSS]
-  C --> D[AI Workflow  ➜  Book‑insight ＋ Hotspots]
-  D -->|hotspots.json| E[Core API]
-  E --> F[(PostgreSQL)]
-  F --> G[Frontend Renderer]
-```
+| Table          | Purpose                                     | Key Columns                                                             | Produced by                    | Consumed by          |
+| -------------- | ------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------ | -------------------- |
+| **books**      | Master record per book                      | `id`, `title`, `language`, `cover_url`, **`tags jsonb`**                | Tag WF ➡ API                   | Frontend, Analytics  |
+| **chapters**   | Chapter HTML metadata                       | `book_id`, `idx`, `html_url`, **`final_html_url`**                      | HTML Extractor & Patch Service | Hotspot WF, Frontend |
+| **hotspots**   | Interactive anchors & media                 | `book_id`, `chapter_idx`, `anchor_id`, `excerpt`, `image_url`, `status` | Hotspot WF → Render WF         | Frontend, Analytics  |
+| **profiles**   | User‑extended profile (1‑to‑1 `auth.users`) | `id(uuid PK)`, `display_name`, `avatar_url` …                           | Core API                       | Frontend             |
+| **event\_log** | Raw user events for KPI                     | `user_id`, `event`, `target_id`, `meta`, `created_at`                   | Frontend SDK                   | KPI Jobs             |
 
----
-
-## 2  HTML Extraction & Processing Pipeline
-
-### 2.1 HTML Extractor
-
-**Input:** EPUB file from `books.epub_url`
-
-**Process:**
-1. Extract raw HTML files from EPUB structure
-2. Apply intelligent noise filtering:
-   - Remove advertisement content
-   - Filter copyright notices
-   - Clean directory links and navigation elements
-   - Preserve legitimate chapter titles (e.g., "Adjustments", "Addendum")
-3. Generate dual-version output:
-   - `raw_html/` - Original extracted content
-   - `cleaned_html/` - Intelligently filtered content
-
-**Configuration:** Uses `config.py` with customizable:
-- `NOISE_TITLES` - Keywords for content filtering
-- `NOISE_FILENAMES` - Patterns for file filtering
-- Minimum text length thresholds
-- Comment preservation settings
-
-
+> **Note**  System table `auth.users` lives in `auth` schema and stays untouched.
 
 ---
 
+## 2  Workflow Interfaces
 
+### 2.1  Book‑tags WF
 
----
-
-## 4  AI Workflow
-
-### 4.1 Input
+*Input*
 
 ```jsonc
 {
-  "book_id": "4d5c90e2-f21c-4e9b-b3d0-024d3adca52f",
-  "chapter_html_prefix": "https://cdn.imaread.com/books/4d5c90e2/{idx}.html",
-  "book_meta": {
-    "title": "Dune",
-    "author": "Frank Herbert"
-  }
+  "book_id": "4d5c…",
+  "title": "三体",
+  "author": "刘慈欣",
+  "bucket_prefix": "https://cdn.xxx.com/books/4d5c/"
 }
 ```
 
-Workflow internally performs:
-
-1. Web‑search & LLM summarisation → create in‑memory style / character context.
-2. For each chapter HTML file, pick hotspots → generate image/audio → upload to OSS.
-
-### 4.2 Output — `hotspots.json`
-
-Array, sorted by chapter.
-
-| Field           | Type      | Req    | Notes                                       |                       |
-| --------------- | --------- | ------ | ------------------------------------------- | --------------------- |
-| `hotspot_id`    | `uuid`    | ✔      | Primary key                                 |                       |
-| `chapter_idx`   | `int`     | ✔      | Matches `chapter_idx`                       |                       |
-| `char_range`    | `int[2]`  | ✖      | `[start, end]` character offset             |                       |
-| `text_excerpt`  | `string`  | ✔      | 0‑200 chars                                 |                       |
-| `image_url`     | `string`  | ✔      | OSS URL                                     |                       |
-| `audio_url`     | \`string  | null\` | ✖                                           | OSS URL or `null`     |
-| `prompt_used`   | `json`    | ✖      | Prompt scaffold after variable substitution |                       |
-| `created_at`    | `iso8601` | ✔      | —                                           |                       |
-| `status`        | `enum`    | ✔      | `success` / `error`                         |                       |
-| `error_message` | \`string  | null\` | ✖                                           | For failed generation |
-
-> **Delivery:** POST JSON to `/api/workflow/hotspots` or put to S3 then callback.
-
----
-
-## 5  DB Mapping (PostgreSQL example)
-
-### `chapters`
-
-```sql
-CREATE TABLE chapters (
-  id           BIGSERIAL PRIMARY KEY,
-  book_id      BIGINT NOT NULL,
-  idx          INT NOT NULL,
-  html_url     VARCHAR(512) NOT NULL,
-  word_count   INT,
-  created_at   TIMESTAMP DEFAULT NOW(),
-  UNIQUE (book_id, idx)
-);
-```
-
-### `hotspots`
-
-```sql
-CREATE TABLE hotspots (
-  id            CHAR(36) PRIMARY KEY,
-  book_id       BIGINT NOT NULL,
-  chapter_idx   INT NOT NULL,
-  char_start    INT,
-  char_end      INT,
-  text_excerpt  TEXT NOT NULL,
-  image_url     VARCHAR(512) NOT NULL,
-  audio_url     VARCHAR(512),
-  prompt_json   JSON,
-  status        ENUM('success','error') DEFAULT 'success',
-  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
----
-
-## 6  Error & Retry Policy
-
-| Stage               | Detect           | Retry                   | Escalate             |
-| ------------------- | ---------------- | ----------------------- | -------------------- |
-| HTML Extraction     | Parse error      | 2× with different config | Flag `extraction_failed` |
-| Upload chapter HTML | HTTP != 200      | 3× exponential back‑off | Flag `import_failed` |
-| AI Workflow         | `status = error` | Manual re‑queue         | Slack alert          |
-
----
-
-## 7  Glossary
-
-| Term               | Meaning                                            |
-| ------------------ | -------------------------------------------------- |
-| **Char range**     | `[start,end]` — HTML character offset positioning |
-| **Hotspot**        | Interactive dot binding a text range to rich media |
-| **Style template** | Prompt scaffold auto‑derived per book              |
-
----
-
-## 8  📋 Sample JSON Payloads
-
-
-
-### 7.1 `hotspots.json`
+*Output* ⇒ `PATCH /api/books/{book_id}`
 
 ```json
-[
-  {
-    "hotspot_id": "d4ea77b2-1519-4b75-9f28-51a2e43ff7a6",
-    "chapter_idx": 1,
-    "char_range": [1250, 1320],
-    "text_excerpt": "A dust cloud swirled beyond the shield wall…",
-    "image_url": "https://cdn.imaread.com/books/4d5c90e2/images/ch1-spot1.jpg",
-    "audio_url": null,
-    "prompt_used": {
-      "scene": "desert storm",
-      "style": "retro‑sci‑fi, warm tones, cinematic"
-    },
-    "created_at": "2025-07-28T08:15:33Z",
-    "status": "success"
-  }
-]
+{ "tags": ["hard‑sci‑fi", "三体文明", "反乌托邦"] }
+```
+
+### 2.2  Hotspot‑pick WF
+
+Same input + JSON output array `hotspots.json`  ➜ `POST /api/workflow/hotspots`.
+
+### 2.3  Render WF
+
+Polls `hotspots` rows where `status = 'pending'` and fills `image_url`, `audio_url`, sets `status = 'success' | 'error'`.
+
+---
+
+## 3  Schema Changes (SQL Delta)
+
+```sql
+-- books: add tags
+alter table public.books
+  add column if not exists tags jsonb default '[]'::jsonb;
+create index if not exists books_tags_gin on public.books using gin(tags);
+
+-- chapters: add final html url
+alter table public.chapters
+  add column if not exists final_html_url text;
+
+-- KPI raw events
+create table if not exists public.event_log (
+  id bigint generated always as identity primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  event text not null,
+  target_id text,
+  meta jsonb,
+  created_at timestamp default now()
+);
+create index if not exists event_log_event_time on public.event_log(event, created_at);
 ```
 
 ---
 
-## 9  REST API Sketch
+## 4  Glossary
 
-### 8.1 Run AI Workflow
-
-```
-POST /api/workflow/run
-{
-  "book_id": "4d5c90e2-f21c-4e9b-b3d0-024d3adca52f",
-  "chapter_html_prefix": "https://cdn.imaread.com/books/4d5c90e2/{idx}.html",
-  "book_meta": {
-    "title": "Dune",
-    "author": "Frank Herbert"
-  }
-}
-→ 201 { "task_id": "a3f1…" }
-```
-
-### 8.2 Task Status
-
-```
-GET /api/workflow/status/{task_id}
-→ 200 { "state": "processing", "progress": 42 }
-```
-
-### 8.3 Workflow Callback — Hotspots ingest
-
-```
-POST /api/workflow/hotspots
-Authorization: Bearer {internal_token}
-Body: hotspots.json (see 7.2)
-→ 202 Accepted
-```
-
-### 8.4 Frontend Read APIs
-
-* `GET /api/books/{book_id}/chapters/{chapter_idx}` → `{ chapter_meta, hotspots[] }`
-* `POST /api/hotspots/{hotspot_id}/variations` → create user variation
-* `GET /api/users/{user_id}/progress/{book_id}` / `PUT` same endpoint to update reading progress
-
-> **Auth:** All user endpoints require JWT issued by Authing.
+* **Final HTML**   — chapter HTML after anchor injection, referenced by `chapters.final_html_url`.
+* **Workflow**    — n8n pipeline containing only Supabase + HTTP nodes (no code exec).
 
 ---
 
-*© ImaRead · Draft 0.3 — ready for team review*
+© ImaRead · Draft v0.5 — awaiting review

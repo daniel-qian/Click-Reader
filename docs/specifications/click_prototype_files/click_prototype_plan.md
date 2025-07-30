@@ -1,166 +1,122 @@
-# 📑 Data Contract — Interactive Reading MVP  (2025‑07 **Revised – Anchor‑Injection Edition**)
+# 🛠️ Prototype Plan — Click Interactive Reader v0.5
 
-> **Scope:** Defines artefacts, schemas and hand‑off points between the *Pre‑processor* (HTML Extractor + Anchor Patcher), the **single** *AI Workflow* (book‑insight + hotspot generator) and the *Core API / DB*.
-
----
-
-## 0  Lifecycle & Versioning
-
-| Field            | Value                                                             |
-| ---------------- | ----------------------------------------------------------------- |
-| `schema_version` | `0.4.0`   ⇢ **breaking** (replaces `char_range` with `anchor_id`) |
-| `last_updated`   | `2025‑07‑29`                                                      |
-| **Change rule**  | MAJOR – breaking · MINOR – additive · PATCH – docs/typo           |
+> **Purpose**  Blueprint for the next two‑month prototype sprint, reflecting the *three‑workflow* architecture and Supabase switch‑over.
+>
+> **Audience**  Product owner · Workflow team · Backend/FE dev · DevOps.
+>
+> **Status**  Draft v0.5 · 2025‑07‑30
 
 ---
 
-## 1  High‑level Flow
+## 1  Goals (Sprint Δ)
+
+| # | Objective                                               | Metric                                     | Owner         |
+| - | ------------------------------------------------------- | ------------------------------------------ | ------------- |
+| 1 | **End‑to‑end book import** via separated workflows      | import 3 demo books w/ ≥95% anchor success | Workflow team |
+| 2 | **Supabase integration** complete                       | CRUD from FE + RLS policies live           | Backend       |
+| 3 | **Reader PoC** loads patched HTML & renders hotspots    | 30 fps on mid‑range mobile                 | Frontend      |
+| 4 | **Event tracking** feeds KPI views (`dau_mv`, `ctr_mv`) | dashboard auto‑refresh hourly              | Data eng      |
+
+---
+
+## 2  System Decomposition (UPDATED)
 
 ```mermaid
 graph TD
-  A[EPUB / PDF] --> B(HTML Extractor)
-  B -->|cleaned HTML| C[S3 / OSS : chapters/{idx}.html]
-  C --> D[AI Workflow  ➜  Book‑insight ＋ Hotspots]
-  D -->|hotspots.json| E[Anchor Patcher Script]
-  E -->|HTML v2 (with <span>)| C
-  E -->|hotspots.json| F[(PostgreSQL)]
-  F --> G[Core API]
-  G --> H[Frontend Renderer]
+  subgraph Ingest
+    A[EPUB upload] --> B(HTML Extractor)
+    B --> C[/bucket bookhtml/]
+  end
+
+  subgraph WF‑A TagInsight
+    C --> D[Book Tags WF]
+    D -->|PATCH {tags}| API1
+  end
+
+  subgraph WF‑B HotspotPick
+    C --> E[Hotspot Pick WF]
+    E -->|hotspots.json| API2
+  end
+
+  subgraph DB
+    API1 & API2 --> F[(Supabase DB)]
+  end
+
+  subgraph WF‑C Render
+    F -->|pending| G[Media Render WF]
+    G -->|img urls| H(CDN)
+    G -->|PATCH| API3
+  end
+
+  F --> FE[Next.js Reader]
 ```
 
-> **Key difference:** *Anchor Patcher* runs **after** the AI Workflow, finds each `excerpt` in the chapter HTML, injects a `<span id="h123" class="hotspot">`, uploads the patched HTML, then writes hotspot rows into Postgres.
+**Principles**
+
+1. Workflows orchestrate only **Supabase nodes + HTTP calls** – no custom code in n8n.
+2. Heavy compute & parsing lives in managed **backend micro‑services**.
+3. All artefacts flow through **JSON contracts** committed in `/specs` repo.
 
 ---
 
-## 2  HTML Extraction & Cleaning
+## 3  Database & Security
 
-*保持 v0.3 逻辑—仅提炼**干净 HTML**。Anchor 不在此阶段插入。*
+*RLS*: `profiles` self‑only; `event_log` insert‑only; public selects on `books` & `chapters`.
 
-Output directories:
+*Key Indexes*: `books_tags_gin`, `hotspots (book_id,anchor_id)`.
 
-* `cleaned_html/✱.html`   ⇒ CDN path `/chapters/{idx}.html`
-* `extraction_report.json` ⇒ rule hits / skipped pages
-
----
-
-## 3  Anchor Patcher (NEW)
-
-| Step | Action                                                                                               |
-| ---- | ---------------------------------------------------------------------------------------------------- |
-| ①    | Receive *hotspots.json* + chapter HTML path                                                          |
-| ②    | For each hotspot: use **TextQuoteSelector** (`excerpt`, `prefix`, `suffix`) to create DOM `Range`    |
-| ③    | Insert `<span id="{anchor_id}" class="hotspot" data-cat="{category}"></span>` **before** range start |
-| ④    | De‑duplicate: if same excerpt already has anchor, skip                                               |
-| ⑤    | Upload patched HTML to same CDN path, bump query ver (`?v=2`)                                        |
-| ⑥    | POST hotspot rows to `/api/internal/hotspots/bulk`                                                   |
+> See <mcfile name="click_data_contract.md" path="d:\\Click-Reader\\docs\\specifications\\click_prototype_files\\click_data_contract.md"></mcfile> for complete schema details.
 
 ---
 
-## 4  AI Workflow
+## 4  API Surface (Server)
 
-### 4.1 Input (unchanged)
+| Method  | Path                         | Used by    | Notes                        |
+| ------- | ---------------------------- | ---------- | ---------------------------- |
+| `POST`  | `/api/books`                 | Tag WF     | upsert minimal row on import |
+| `PATCH` | `/api/books/{id}`            | Tag WF     | write tags                   |
+| `POST`  | `/api/workflow/hotspots`     | Hotspot WF | bulk insert (JSON array)     |
+| `PATCH` | `/api/hotspots/{id}`         | Render WF  | set image/audio url & status |
+| `GET`   | `/api/chapters/{book}/{idx}` | FE         | presigned CDN url redirect   |
 
-```jsonc
-{
-  "book_id": "UUID",
-  "chapter_html_prefix": "https://cdn…/{idx}.html",
-  "book_meta": { "title": "…", "author": "…" }
-}
-```
-
-### 4.2 Output — `hotspots.json`  ( **BREAKING** )
-
-```jsonc
-[
-  {
-    "hotspot_id" : "uuid",
-    "chapter_idx" : 3,
-    "category"    : "Scenic",
-    "excerpt"     : "Passing through Resurrection Gate …",
-    "selector"    : {
-      "type"   : "TextQuote",        // W3C selector
-      "exact"  : "Passing through Resurrection Gate …",
-      "prefix" : "he turned his",
-      "suffix" : "toward Theatre Square"
-    },
-    "image_url"   : "https://…",
-    "prompt_json" : { … },
-    "created_at"  : "ISO‑8601"
-  }
-]
-```
-
-*Removed*: **`char_range`**
+All endpoints secured with **service key + IP allow‑list** (workflows run inside same VPC).
 
 ---
 
-## 5  DB Schema (PostgreSQL)
+## 5  KPI Telemetry (MVP)
 
-### `chapters`
+| Metric               | Source                   | Agg View     | Refresh            |
+| -------------------- | ------------------------ | ------------ | ------------------ |
+| **DAU**              | `event_log (app_open)`   | `dau_mv`     | hourly (`pg_cron`) |
+| **Hotspot CTR**      | `event_log (view/click)` | `ctr_mv`     | hourly             |
+| **Avg. read length** | `page_turn` events       | `readlen_mv` | daily              |
 
-```sql
-CREATE TABLE chapters (
-  book_id    BIGINT,
-  idx        INT,
-  html_url   VARCHAR(512),
-  html_ver   SMALLINT DEFAULT 1,
-  PRIMARY KEY (book_id, idx)
-);
-```
-
-### `hotspots`
-
-```sql
-CREATE TABLE hotspots (
-  id           BIGSERIAL PRIMARY KEY,
-  book_id      BIGINT      NOT NULL,
-  chapter_idx  INT         NOT NULL,
-  anchor_id    VARCHAR(64) NOT NULL,
-  category     VARCHAR(32) NOT NULL,
-  excerpt      TEXT        NOT NULL,
-  image_url    VARCHAR(512),
-  prompt_json  JSONB,
-  created_at   TIMESTAMP   DEFAULT NOW(),
-  UNIQUE (book_id, anchor_id)
-);
-```
+Dashboard → Metabase hosted on Supabase add‑on.
 
 ---
 
-## 6  Glossary (updated)
+## 6  Milestone Timeline
 
-| Term                  | Meaning                                                                       |
-| --------------------- | ----------------------------------------------------------------------------- |
-| **Anchor ID**         | ID of `<span class="hotspot">` inserted into chapter HTML; unique per chapter |
-| **TextQuoteSelector** | `{exact, prefix, suffix}` triple used to locate the excerpt inside HTML       |
-| **Hotspot**           | Interactive dot rendered from `<span.hotspot>` that opens rich‑media card     |
-
----
-
-## 7  Error & Retry Policy  (anchor‑aware)
-
-| Stage             | Retry          | Notes                                                        |
-| ----------------- | -------------- | ------------------------------------------------------------ |
-| Anchor patch fail | 3×             | if selector not found, mark `status=missing`, escalate Slack |
-| CDN upload fail   | 3× exponential | bump `html_ver`, purge cache                                 |
+| Week | Deliverable                                      |
+| ---- | ------------------------------------------------ |
+| W1   | DB migrations + Supabase RLS scripts merged      |
+| W2   | HTML Extractor containerised & pushing to bucket |
+| W3   | TagInsight WF live, writes `tags`                |
+| W4   | HotspotPick WF PoC (static prompt)               |
+| W5   | Render WF hitting Midjourney API mock            |
+| W6   | Reader FE loading hotspots + CSS dots            |
+| W7   | Event SDK & KPI views ready                      |
+| W8   | Demo: click‑through import → reading experience  |
 
 ---
 
-## 8  Sample hotspot row
+## 7  Open Risks / TODO
 
-```json
-{
-  "id"         : 123,
-  "book_id"    : 42,
-  "chapter_idx": 3,
-  "anchor_id"  : "hA1B2",
-  "category"   : "Abstract",
-  "excerpt"    : "A king fortifies himself with a castle, a gentleman with a desk.",
-  "image_url"  : "https://cdn…/images/desk.jpg",
-  "created_at" : "2025-07-29T10:15:00Z"
-}
-```
+* **Anchor selector robustness** — fallback to manual link if match ≈0.
+* **Model cost** — media render WF budget TBD.
+* **Mobile perf** — measure on low‑end Android.
+* **CDN cache purge** — decide between query param bump vs API hook.
 
 ---
 
-© ImaRead · Data Contract v0.4 — team‑review ready
+© ImaRead · Prototype Plan v0.5 — awaiting review
