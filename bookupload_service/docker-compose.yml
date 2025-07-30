@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  epub-extractor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - SUPABASE_STORAGE_BUCKET=${SUPABASE_STORAGE_BUCKET:-bookepub}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-50MB}
+      - TEMP_DIR=${TEMP_DIR:-/tmp}
+      - NODE_ENV=production
+    volumes:
+      - ./temp:/app/temp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - epub-network
+
+networks:
+  epub-network:
+    driver: bridge
+
+volumes:
+  temp-data:
+    driver: local
