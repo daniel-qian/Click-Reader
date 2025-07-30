@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装依赖（仅生产环境）
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # 复制源代码
 COPY . .
@@ -19,8 +19,6 @@ RUN mkdir -p temp
 # 设置环境变量
 ENV NODE_ENV=production \
     PORT=8082 \
-    SUPABASE_URL= \
-    SUPABASE_SERVICE_KEY= \
     SUPABASE_STORAGE_BUCKET=bookepub \
     MAX_FILE_SIZE=50MB \
     TEMP_DIR=/tmp

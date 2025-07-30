@@ -20,7 +20,7 @@
   "dependencies": {
     "express": "^4.18.2",
     "@supabase/supabase-js": "^2.39.0",
-    "epub-parser": "^0.2.6",
+    "epub-parser": "^0.2.5",
     "node-stream-zip": "^1.15.0",
     "axios": "^1.6.2",
     "mime": "^4.0.1",

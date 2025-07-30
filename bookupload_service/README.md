@@ -127,11 +127,21 @@ docker-compose down
 # 构建镜像
 docker build -t epub-extractor-service .
 
-# 运行容器
+# 运行容器（使用环境变量文件）
 docker run -d \
   --name epub-extractor-service \
   -p 8082:8082 \
   --env-file .env \
+  --restart unless-stopped \
+  epub-extractor-service
+
+# 或者直接传入环境变量
+docker run -d \
+  --name epub-extractor-service \
+  -p 8082:8082 \
+  -e SUPABASE_URL=https://your-project.supabase.co \
+  -e SUPABASE_SERVICE_KEY=your_service_key_here \
+  -e SUPABASE_STORAGE_BUCKET=bookepub \
   --restart unless-stopped \
   epub-extractor-service
 
