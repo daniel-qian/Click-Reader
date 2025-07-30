@@ -1,4 +1,5 @@
-FROM node:20-slim
+# 使用ECS服务器上已有的Node.js镜像
+FROM node:latest
 
 # 设置工作目录
 WORKDIR /app

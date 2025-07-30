@@ -83,9 +83,11 @@ jobs:
             -p 8082:8082 \
             -e SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
             -e SUPABASE_SERVICE_KEY="${{ secrets.SUPABASE_SERVICE_KEY }}" \
-            -e BUCKET_HTML=bookhtml \
-            -e BUCKET_COVER=bookcovers \
-            -e PUBLIC_BUCKET=true \
+            -e SUPABASE_STORAGE_BUCKET=bookepub \
+            -e MAX_FILE_SIZE=50MB \
+            -e TEMP_DIR=/tmp \
+            -e NODE_ENV=production \
+            -e PORT=8082 \
             --restart unless-stopped \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           
