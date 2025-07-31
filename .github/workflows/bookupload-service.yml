@@ -1,5 +1,9 @@
 name: Build and Deploy EPUB Extractor
 
+permissions:
+  contents: read
+  packages: write
+
 on:
   push:
     branches: [ master, develop ]
@@ -12,7 +16,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: click-reader/epub-extractor
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:

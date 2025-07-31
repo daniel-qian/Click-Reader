@@ -1,5 +1,7 @@
 # EPUB 解析服务
 
+<!-- Trigger deployment test -->
+
 基于 Node.js + Express 的 EPUB 解析服务，用于将 EPUB 文件解析并存储到 Supabase。
 
 ## 坑/注意事项
