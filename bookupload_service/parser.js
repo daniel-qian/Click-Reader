@@ -8,6 +8,7 @@ import { writeFile, unlink, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mime from 'mime';
+import { v4 as uuidv4 } from 'uuid';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = join(__dirname, 'temp');
@@ -181,14 +182,10 @@ export async function saveBookToDatabase(metadata, coverBase64, supabase) {
     
     const bookData = {
       title: metadata.title || 'Unknown Title',
-      author: metadata.creator || 'Unknown Author',
-      description: metadata.description || '',
+      author: metadata.author || 'Unknown Author',
       language: metadata.language || 'en',
-      publisher: metadata.publisher || '',
-      published_date: metadata.date || null,
       cover_base64: coverBase64,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
     
     const { data, error } = await supabase
@@ -238,24 +235,24 @@ export async function parseEpub(epubUrl, bookId, supabase) {
     tempFilePath = await downloadEpub(epubUrl);
     
     // 2. 提取EPUB内容
-    const { epub, chapters } = await extractEpubContent(tempFilePath);
+    const { metadata, coverData, chapters } = await extractEpubContent(tempFilePath);
     
-    // 3. 提取封面图片为Base64
-    const coverBase64 = await extractCoverBase64(epub);
+    // 3. 提取封面图片为Base64 (coverData 暂时为 null，使用简单的占位符)
+    const coverBase64 = coverData || null;
     
     // 4. 保存书籍信息到数据库（让数据库自动生成ID）
-    const savedBook = await saveBookToDatabase(epub.metadata, coverBase64, supabase);
+    const savedBook = await saveBookToDatabase(metadata, coverBase64, supabase);
     const generatedBookId = savedBook.id;
     
     // 5. 上传章节HTML文件
-    const chapterUrls = await uploadChapterHtmlFiles(chapters, generatedBookId, supabase);
+    const chapterUrls = await uploadChapters(supabase, generatedBookId, chapters);
     
     console.log(`EPUB parsing completed successfully for book: ${generatedBookId}`);
     
     return {
       book_id: generatedBookId,
-      title: epub.metadata.title,
-      author: epub.metadata.creator,
+      title: metadata.title,
+      author: metadata.author,
       chapters: chapters.length,
       cover_base64: coverBase64,
       chapter_urls: chapterUrls,
