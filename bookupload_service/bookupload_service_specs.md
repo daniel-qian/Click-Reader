@@ -162,6 +162,7 @@ curl -X POST http://localhost:8082/extract \
 
 ### 部署注意事项
 
+
 1. 确保数据库 `books` 表已更新为支持自动生成 ID
 2. 确保 `SUPABASE_STORAGE_BUCKET` 环境变量已正确配置
 3. 如果使用现有数据，可能需要数据迁移脚本来处理 `cover_url` 到 `cover_base64` 的转换
