@@ -64,15 +64,28 @@ async function extractEpubContent(filePath) {
       
       try {
         // 提取基本信息
+        console.log('EPUB data structure:', JSON.stringify(epubData, null, 2));
+        
         const metadata = {
-          title: epubData.easy?.primaryID?.value || epubData.raw?.json?.metadata?.title || 'Unknown Title',
-          author: epubData.raw?.json?.metadata?.creator || 'Unknown Author',
-          language: epubData.raw?.json?.metadata?.language || 'en',
-          description: epubData.raw?.json?.metadata?.description || null
+          title: epubData.metadata?.title || epubData.raw?.json?.metadata?.title || 'Unknown Title',
+          author: epubData.metadata?.creator || epubData.metadata?.author || epubData.raw?.json?.metadata?.creator || 'Unknown Author',
+          language: epubData.metadata?.language || epubData.raw?.json?.metadata?.language || 'en'
         };
         
-        // 提取封面 - epub-parser不直接提供封面数据，需要手动提取
+        console.log('Extracted metadata:', metadata);
+        
+        // 提取封面图片
         let coverData = null;
+        if (epubData.cover) {
+          try {
+            const coverBuffer = Buffer.from(epubData.cover.data);
+            const mimeType = epubData.cover.mediaType || 'image/jpeg';
+            coverData = `data:${mimeType};base64,${coverBuffer.toString('base64')}`;
+            console.log('Cover extracted successfully');
+          } catch (coverError) {
+            console.warn('Failed to extract cover:', coverError.message);
+          }
+        }
         
         // 提取章节内容
         console.log('Extracting chapters...');
@@ -107,37 +120,7 @@ async function extractEpubContent(filePath) {
   });
 }
 
-/**
- * 提取封面图片并转换为Base64
- */
-export async function extractCoverBase64(epub) {
-  try {
-    const coverImage = epub.coverImage;
-    if (!coverImage || !coverImage.data) {
-      console.log('No cover image found in EPUB');
-      return null;
-    }
-    
-    // 确定MIME类型
-    let mimeType = 'image/jpeg'; // 默认
-    if (coverImage.extension) {
-      const ext = coverImage.extension.toLowerCase();
-      if (ext === 'png') mimeType = 'image/png';
-      else if (ext === 'gif') mimeType = 'image/gif';
-      else if (ext === 'webp') mimeType = 'image/webp';
-    }
-    
-    // 转换为Base64
-    const base64Data = Buffer.from(coverImage.data).toString('base64');
-    const coverBase64 = `data:${mimeType};base64,${base64Data}`;
-    
-    console.log(`Cover extracted as Base64, size: ${base64Data.length} characters`);
-    return coverBase64;
-  } catch (error) {
-    console.error('Error extracting cover as Base64:', error);
-    return null;
-  }
-}
+// extractCoverBase64 函数已移除，封面提取现在在 extractEpubContent 中完成
 
 /**
  * 上传章节HTML到Supabase Storage
@@ -176,7 +159,7 @@ async function uploadChapters(supabase, bookId, chapters) {
 /**
  * 保存书籍信息到数据库
  */
-export async function saveBookToDatabase(metadata, coverBase64, supabase) {
+export async function saveBookToDatabase(metadata, coverBase64, epubUrl, supabase) {
   try {
     console.log('Saving book to database with auto-generated ID');
     
@@ -184,6 +167,7 @@ export async function saveBookToDatabase(metadata, coverBase64, supabase) {
       title: metadata.title || 'Unknown Title',
       author: metadata.author || 'Unknown Author',
       language: metadata.language || 'en',
+      epub_url: epubUrl,
       cover_base64: coverBase64,
       created_at: new Date().toISOString()
     };
@@ -237,11 +221,11 @@ export async function parseEpub(epubUrl, bookId, supabase) {
     // 2. 提取EPUB内容
     const { metadata, coverData, chapters } = await extractEpubContent(tempFilePath);
     
-    // 3. 提取封面图片为Base64 (coverData 暂时为 null，使用简单的占位符)
-    const coverBase64 = coverData || null;
+    // 3. 使用提取的封面数据
+    const coverBase64 = coverData;
     
     // 4. 保存书籍信息到数据库（让数据库自动生成ID）
-    const savedBook = await saveBookToDatabase(metadata, coverBase64, supabase);
+    const savedBook = await saveBookToDatabase(metadata, coverBase64, epubUrl, supabase);
     const generatedBookId = savedBook.id;
     
     // 5. 上传章节HTML文件
