@@ -10,4 +10,5 @@
 2. github action CI/CD
     1. 配置github上的环境变量
     2. 配置github actions workflows 自动部署docker容器
+    3. 触发cicd需要先设置安全组
     

@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "EPUB Extractor Service API Tests (Updated)",
+    "name": "BOOK Service API Tests (Updated)",
     "description": "Click-Reader EPUB解析服务API测试集 - 支持自动生成ID和base64封面",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_postman_id": "epub-extractor-tests-v2"

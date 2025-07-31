@@ -125,7 +125,7 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 8082;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`EPUB extractor service running on port ${PORT}`);
+  console.log(`book service running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
 });
 

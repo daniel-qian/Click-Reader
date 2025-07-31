@@ -34,7 +34,7 @@ async function downloadEpub(epubUrl) {
       responseType: 'stream',
       timeout: 30000, // 30秒超时
       headers: {
-        'User-Agent': 'Click-Reader EPUB Extractor/1.0'
+        'User-Agent': 'Click-Reader Book Service/1.0'
       }
     });
     
