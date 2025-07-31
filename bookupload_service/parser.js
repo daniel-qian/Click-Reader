@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const epubParser = require('epub-parser');
@@ -108,33 +107,33 @@ async function extractEpubContent(filePath) {
 }
 
 /**
- * 上传封面到Supabase Storage
+ * 提取封面图片并转换为Base64
  */
-async function uploadCover(supabase, bookId, coverData) {
-  if (!coverData) return null;
-  
-  const bucketName = process.env.BUCKET_COVER || 'bookcovers';
-  const fileName = `${bookId}.jpg`;
-  
+export async function extractCoverBase64(epub) {
   try {
-    console.log(`Uploading cover for book ${bookId}...`);
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(fileName, coverData, {
-        contentType: 'image/jpeg',
-        upsert: true
-      });
+    const coverImage = epub.coverImage;
+    if (!coverImage || !coverImage.data) {
+      console.log('No cover image found in EPUB');
+      return null;
+    }
     
-    if (error) throw error;
+    // 确定MIME类型
+    let mimeType = 'image/jpeg'; // 默认
+    if (coverImage.extension) {
+      const ext = coverImage.extension.toLowerCase();
+      if (ext === 'png') mimeType = 'image/png';
+      else if (ext === 'gif') mimeType = 'image/gif';
+      else if (ext === 'webp') mimeType = 'image/webp';
+    }
     
-    // 获取公开URL
-    const { data: urlData } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(fileName);
+    // 转换为Base64
+    const base64Data = Buffer.from(coverImage.data).toString('base64');
+    const coverBase64 = `data:${mimeType};base64,${base64Data}`;
     
-    return urlData.publicUrl;
+    console.log(`Cover extracted as Base64, size: ${base64Data.length} characters`);
+    return coverBase64;
   } catch (error) {
-    console.warn('Failed to upload cover:', error.message);
+    console.error('Error extracting cover as Base64:', error);
     return null;
   }
 }
@@ -176,34 +175,39 @@ async function uploadChapters(supabase, bookId, chapters) {
 /**
  * 保存书籍信息到数据库
  */
-async function saveBookToDatabase(supabase, bookId, metadata, epubUrl, coverUrl) {
+export async function saveBookToDatabase(metadata, coverBase64, supabase) {
   try {
-    console.log(`Saving book ${bookId} to database...`);
+    console.log('Saving book to database with auto-generated ID');
+    
+    const bookData = {
+      title: metadata.title || 'Unknown Title',
+      author: metadata.creator || 'Unknown Author',
+      description: metadata.description || '',
+      language: metadata.language || 'en',
+      publisher: metadata.publisher || '',
+      published_date: metadata.date || null,
+      cover_base64: coverBase64,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
     const { data, error } = await supabase
       .from('books')
-      .insert({
-        id: bookId,
-        title: metadata.title,
-        author: metadata.author,
-        language: metadata.language,
-        epub_url: epubUrl,
-        cover_url: coverUrl,
-        tags: [],
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
+      .insert([bookData])
+      .select();
     
     if (error) {
       if (error.code === '23505') { // 唯一约束违反
-        throw new Error(`Book with ID ${bookId} already exists`);
+        throw new Error('Book already exists in database');
       }
-      throw error;
+      throw new Error(`Database error: ${error.message}`);
     }
     
-    return data;
+    console.log(`Book saved successfully with auto-generated ID: ${data[0].id}`);
+    return data[0];
   } catch (error) {
-    throw new Error(`Failed to save book to database: ${error.message}`);
+    console.error('Error saving book to database:', error);
+    throw error;
   }
 }
 
@@ -225,34 +229,40 @@ async function cleanup(filePath) {
  * 主解析函数
  */
 export async function parseEpub(epubUrl, bookId, supabase) {
-  const finalBookId = bookId || uuidv4();
   let tempFilePath = null;
   
   try {
+    console.log(`Starting EPUB parsing for: ${epubUrl}`);
+    
     // 1. 下载EPUB文件
     tempFilePath = await downloadEpub(epubUrl);
     
-    // 2. 解析EPUB内容
-    const { metadata, coverData, chapters } = await extractEpubContent(tempFilePath);
+    // 2. 提取EPUB内容
+    const { epub, chapters } = await extractEpubContent(tempFilePath);
     
-    // 3. 上传封面
-    const coverUrl = await uploadCover(supabase, finalBookId, coverData);
+    // 3. 提取封面图片为Base64
+    const coverBase64 = await extractCoverBase64(epub);
     
-    // 4. 保存书籍信息到数据库
-    await saveBookToDatabase(supabase, finalBookId, metadata, epubUrl, coverUrl);
+    // 4. 保存书籍信息到数据库（让数据库自动生成ID）
+    const savedBook = await saveBookToDatabase(epub.metadata, coverBase64, supabase);
+    const generatedBookId = savedBook.id;
     
-    // 5. 上传章节HTML文件到Storage
-    await uploadChapters(supabase, finalBookId, chapters);
+    // 5. 上传章节HTML文件
+    const chapterUrls = await uploadChapterHtmlFiles(chapters, generatedBookId, supabase);
+    
+    console.log(`EPUB parsing completed successfully for book: ${generatedBookId}`);
     
     return {
-      book_id: finalBookId,
+      book_id: generatedBookId,
+      title: epub.metadata.title,
+      author: epub.metadata.creator,
       chapters: chapters.length,
-      cover_url: coverUrl,
-      title: metadata.title,
-      author: metadata.author
+      cover_base64: coverBase64,
+      chapter_urls: chapterUrls,
+      message: 'EPUB parsed and uploaded successfully'
     };
   } catch (error) {
-    console.error('EPUB parsing failed:', error);
+    console.error('Error in parseEpub:', error);
     throw error;
   } finally {
     // 清理临时文件

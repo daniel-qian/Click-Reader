@@ -5,11 +5,11 @@ import { parseEpub } from './parser.js';
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 
-// 环境变量验证
-const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
+// 验证必要的环境变量
+const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'SUPABASE_STORAGE_BUCKET'];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    console.error(`Missing required environment variable: ${envVar}`);
+    console.error(`Error: ${envVar} environment variable is required`);
     process.exit(1);
   }
 }
@@ -24,46 +24,85 @@ app.get('/health', (req, res) => {
   res.json({ status: 'up', timestamp: new Date().toISOString() });
 });
 
+// 列出Supabase Storage中的EPUB文件
+app.get('/epubs', async (req, res, next) => {
+  try {
+    const bucket = process.env.SUPABASE_STORAGE_BUCKET;
+    const { data, error } = await supabase
+      .storage
+      .from(bucket)
+      .list('', {
+        sortBy: { column: 'name', order: 'asc' }
+      });
+    
+    if (error) {
+      console.error('Error listing files:', error);
+      return res.status(500).json({
+        error: 'Failed to list files',
+        code: 'STORAGE_ERROR'
+      });
+    }
+    
+    // 只过滤.epub文件
+    const epubFiles = data.filter(file => file.name.toLowerCase().endsWith('.epub'));
+    
+    // 为每个文件构建完整URL
+    const filesWithUrls = await Promise.all(epubFiles.map(async file => {
+      const { data: { publicUrl } } = supabase
+        .storage
+        .from(bucket)
+        .getPublicUrl(file.name);
+        
+      return {
+        name: file.name,
+        size: file.metadata?.size || file.size,
+        created_at: file.created_at,
+        updated_at: file.updated_at,
+        url: publicUrl
+      };
+    }));
+    
+    res.json({
+      files: filesWithUrls,
+      total: filesWithUrls.length
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // EPUB解析接口
-app.post('/extract', async (req, res) => {
-  const { epub_url, book_id } = req.body;
-  
+app.post('/extract', async (req, res, next) => {
+  const { epub_url } = req.body;
+
   if (!epub_url) {
-    return res.status(400).json({ 
-      error: 'epub_url is required',
+    return res.status(400).json({
+      error: 'Missing epub_url parameter',
       code: 'MISSING_EPUB_URL'
     });
   }
 
   try {
-    console.log(`Starting EPUB extraction for: ${epub_url}`);
-    const result = await parseEpub(epub_url, book_id, supabase);
-    console.log(`Successfully extracted book: ${result.book_id}`);
-    return res.json(result);
-  } catch (error) {
-    console.error('EPUB extraction failed:', error);
+    // 传递null作为book_id，让数据库自动生成ID
+    const result = await parseEpub(epub_url, null, supabase);
+    res.json(result);
+  } catch (err) {
+    console.error('Error processing EPUB:', err);
     
-    // 根据错误类型返回不同状态码
-    if (error.message.includes('already exists')) {
-      return res.status(409).json({ 
-        error: error.message,
+    // 根据错误类型返回不同的HTTP状态码和错误码
+    if (err.message.includes('Book already exists')) {
+      return res.status(409).json({
+        error: 'Book already exists in the database',
         code: 'BOOK_EXISTS'
       });
-    }
-    
-    if (error.message.includes('download') || error.message.includes('fetch')) {
-      return res.status(400).json({ 
+    } else if (err.message.includes('Failed to download EPUB')) {
+      return res.status(400).json({
         error: 'Failed to download EPUB file',
-        code: 'DOWNLOAD_FAILED',
-        details: error.message
+        code: 'DOWNLOAD_FAILED'
       });
     }
     
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR',
-      details: error.message
-    });
+    next(err);
   }
 });
 

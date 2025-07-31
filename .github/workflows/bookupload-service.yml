@@ -2,11 +2,11 @@ name: Build and Deploy EPUB Extractor
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master, develop ]
     paths:
       - 'bookupload_service/**'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'bookupload_service/**'
 
@@ -60,7 +60,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     
     steps:
     - name: Deploy to ECS
@@ -70,6 +70,9 @@ jobs:
         username: ${{ secrets.ECS_USER }}
         key: ${{ secrets.ECS_SSH_KEY }}
         script: |
+          # 登录到GitHub Container Registry
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
           # 停止现有容器
           docker stop epub-extractor-service || true
           docker rm epub-extractor-service || true
@@ -84,6 +87,9 @@ jobs:
             -e SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
             -e SUPABASE_SERVICE_KEY="${{ secrets.SUPABASE_SERVICE_KEY }}" \
             -e SUPABASE_STORAGE_BUCKET=bookepub \
+            -e BUCKET_HTML=bookhtml \
+            -e BUCKET_COVER=bookcover \
+            -e PUBLIC_BUCKET=public \
             -e MAX_FILE_SIZE=50MB \
             -e TEMP_DIR=/tmp \
             -e NODE_ENV=production \
@@ -95,7 +101,7 @@ jobs:
           docker image prune -f
           
           # 验证部署
-          sleep 10
+          sleep 15
           curl -f http://localhost:8082/health || exit 1
           
-          echo "Deployment successful!"
+          echo "Deployment successful! Service is running on port 8082"

@@ -2,6 +2,12 @@
 
 基于 Node.js + Express 的 EPUB 解析服务，用于将 EPUB 文件解析并存储到 Supabase。
 
+## 坑/注意事项
+
+- 由于ecs位于国内，网络拉取不了node，用docker images检查已有的镜像发现有node可以直接使用，所以直接用
+- 注意清理悬空镜像
+- ide使用的是windows电脑，不要自动执行Ubuntu命令，只需要告诉我我手动ssh到ecs上执行
+
 ## 功能特性
 
 - 📚 EPUB 文件下载和解析

@@ -1,0 +1,277 @@
+{
+  "info": {
+    "name": "EPUB Extractor Service API Tests (Updated)",
+    "description": "Click-Reader EPUB解析服务API测试集 - 支持自动生成ID和base64封面",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "epub-extractor-tests-v2"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://120.55.193.82:8082",
+      "type": "string"
+    },
+    {
+      "key": "local_url",
+      "value": "http://localhost:8082",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has correct structure', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('status');",
+              "    pm.expect(jsonData).to.have.property('timestamp');",
+              "    pm.expect(jsonData.status).to.eql('up');",
+              "});",
+              "",
+              "pm.test('Response time is less than 1000ms', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "检查服务健康状态"
+      },
+      "response": []
+    },
+    {
+      "name": "List EPUB Files",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has correct structure', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('files');",
+              "    pm.expect(jsonData).to.have.property('total');",
+              "    pm.expect(jsonData.files).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('Each file has required properties', function () {",
+              "    const jsonData = pm.response.json();",
+              "    if (jsonData.files.length > 0) {",
+              "        const file = jsonData.files[0];",
+              "        pm.expect(file).to.have.property('name');",
+              "        pm.expect(file).to.have.property('url');",
+              "        pm.expect(file).to.have.property('size');",
+              "        pm.expect(file.name).to.include('.epub');",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/epubs",
+          "host": ["{{base_url}}"],
+          "path": ["epubs"]
+        },
+        "description": "获取Supabase Storage中的EPUB文件列表"
+      },
+      "response": []
+    },
+    {
+      "name": "Extract EPUB - Auto Generated ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has auto-generated book_id', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('book_id');",
+              "    pm.expect(jsonData.book_id).to.be.a('number');",
+              "});",
+              "",
+              "pm.test('Response has cover_base64 instead of cover_url', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('cover_base64');",
+              "    if (jsonData.cover_base64) {",
+              "        pm.expect(jsonData.cover_base64).to.include('data:image/');",
+              "        pm.expect(jsonData.cover_base64).to.include('base64,');",
+              "    }",
+              "});",
+              "",
+              "pm.test('Response time is reasonable', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(30000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"epub_url\": \"https://www.gutenberg.org/ebooks/74.epub.noimages\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/extract",
+          "host": ["{{base_url}}"],
+          "path": ["extract"]
+        },
+        "description": "使用有效的EPUB URL进行解析测试，ID由数据库自动生成"
+      },
+      "response": []
+    },
+    {
+      "name": "Extract EPUB - Missing URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Error message is correct', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "    pm.expect(jsonData.code).to.eql('MISSING_EPUB_URL');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/extract",
+          "host": ["{{base_url}}"],
+          "path": ["extract"]
+        },
+        "description": "测试缺少epub_url参数的错误处理"
+      },
+      "response": []
+    },
+    {
+      "name": "Extract EPUB - Invalid URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400 or 500', function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+              "});",
+              "",
+              "pm.test('Error response has proper structure', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData).to.have.property('code');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"epub_url\": \"https://invalid-url-that-does-not-exist.com/fake.epub\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/extract",
+          "host": ["{{base_url}}"],
+          "path": ["extract"]
+        },
+        "description": "测试无效URL的错误处理"
+      },
+      "response": []
+    },
+    {
+      "name": "404 Not Found Test",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test('Error code is NOT_FOUND', function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.code).to.eql('NOT_FOUND');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/nonexistent-endpoint",
+          "host": ["{{base_url}}"],
+          "path": ["nonexistent-endpoint"]
+        },
+        "description": "测试404错误处理"
+      },
+      "response": []
+    }
+  ]
+}
