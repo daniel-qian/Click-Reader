@@ -11,5 +11,6 @@
     1. 配置github上的环境变量
     2. 配置github actions workflows 自动部署docker容器
     3. 触发cicd需要先设置安全组
-    4. 
+    4. 服务器开启代理，不然拉不了 github容器服务中构建好的容器
+    5. 后面可以转成阿里云容器镜像服务ACR
     
