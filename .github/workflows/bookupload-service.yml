@@ -1,4 +1,4 @@
-name: Build and Deploy Book Service
+name: Build and Deploy EPUB Extractor
 
 permissions:
   contents: read
