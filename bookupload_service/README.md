@@ -11,8 +11,6 @@
 - ide使用的是windows电脑，不要自动执行Ubuntu命令，只需要告诉我我手动ssh到ecs上执行
 
 ## 功能特性
-
-
  
 - 📚 EPUB 文件下载和解析
 - 🖼️ 封面图片提取和上传到 Storage
@@ -135,28 +133,28 @@ docker-compose down
 
 ```bash
 # 构建镜像
-docker build -t epub-extractor-service .
+docker build -t click-book-service .
 
 # 运行容器（使用环境变量文件）
 docker run -d \
-  --name epub-extractor-service \
+  --name click-book-service \
   -p 8082:8082 \
   --env-file .env \
   --restart unless-stopped \
-  epub-extractor-service
+  click-book-service
 
 # 或者直接传入环境变量
 docker run -d \
-  --name epub-extractor-service \
+  --name click-book-service \
   -p 8082:8082 \
   -e SUPABASE_URL=https://your-project.supabase.co \
   -e SUPABASE_SERVICE_KEY=your_service_key_here \
   -e SUPABASE_STORAGE_BUCKET=bookepub \
   --restart unless-stopped \
-  epub-extractor-service
+  click-book-service
 
 # 查看日志
-docker logs epub-extractor-service
+docker logs click-book-service
 ```
 
 ### 生产环境部署

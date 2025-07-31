@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ImageName = "epub-extractor"
-$ContainerName = "epub-extractor-service"
+$ContainerName = "click-book-service"
 $Port = "8082"
 
 Write-Host "🚀 开始部署 EPUB 解析服务 (环境: $Environment)" -ForegroundColor Green

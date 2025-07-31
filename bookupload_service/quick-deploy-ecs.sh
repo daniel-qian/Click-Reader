@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 配置变量
-SERVICE_NAME="epub-extractor-service"
+SERVICE_NAME="click-book-service"
 PORT="8082"
 ENV_FILE=".env"
 

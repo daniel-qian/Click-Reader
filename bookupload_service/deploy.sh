@@ -6,8 +6,8 @@
 set -e
 
 # 配置变量
-IMAGE_NAME="epub-extractor-service"
-CONTAINER_NAME="epub-extractor-service"
+IMAGE_NAME="click-book-service"
+CONTAINER_NAME="click-book-service"
 PORT="8082"
 DOCKERFILE_PATH="."
 ENV_FILE=".env"

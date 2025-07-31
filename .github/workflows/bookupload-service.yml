@@ -78,15 +78,15 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
           # 停止现有容器
-          docker stop epub-extractor-service || true
-          docker rm epub-extractor-service || true
+          docker stop click-book-service || true
+          docker rm click-book-service || true
           
           # 拉取最新镜像
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           
           # 启动新容器
           docker run -d \
-            --name epub-extractor-service \
+            --name click-book-service \
             -p 8082:8082 \
             -e SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
             -e SUPABASE_SERVICE_KEY="${{ secrets.SUPABASE_SERVICE_KEY }}" \

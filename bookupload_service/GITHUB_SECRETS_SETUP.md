@@ -166,7 +166,7 @@ ssh -o ServerAliveInterval=60 root@120.55.193.82
 docker ps
 
 # 查看容器日志
-docker logs epub-extractor-service
+docker logs click-book-service
 
 # 测试健康检查
 curl http://localhost:8082/health

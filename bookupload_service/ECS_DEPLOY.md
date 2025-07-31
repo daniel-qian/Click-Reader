@@ -182,10 +182,10 @@ sudo ufw reload
 docker ps
 
 # 查看服务日志
-docker logs epub-extractor-service
+docker logs click-book-service
 
 # 实时查看日志
-docker logs -f epub-extractor-service
+docker logs -f click-book-service
 ```
 
 ### 重启服务
@@ -205,8 +205,8 @@ docker-compose restart
 docker-compose down
 
 # 或者直接停止容器
-docker stop epub-extractor-service
-docker rm epub-extractor-service
+docker stop click-book-service
+docker rm click-book-service
 ```
 
 ### 更新服务
@@ -333,13 +333,13 @@ sudo systemctl start epub-extractor.service
 
 ```bash
 # 查看详细错误日志
-docker logs epub-extractor-service --tail 100
+docker logs click-book-service --tail 100
 
 # 查看系统日志
 sudo journalctl -u docker.service
 
 # 查看应用日志
-docker exec epub-extractor-service cat /app/logs/app.log
+docker exec click-book-service cat /app/logs/app.log
 ```
 
 ## 性能优化
@@ -430,7 +430,7 @@ server {
 cp .env .env.backup.$(date +%Y%m%d)
 
 # 备份Docker镜像
-docker save epub-extractor-service > epub-service-backup.tar
+docker save click-book-service > epub-service-backup.tar
 ```
 
 ### 恢复服务
